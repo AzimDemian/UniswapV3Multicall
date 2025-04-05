@@ -6,5 +6,6 @@ edition = "2024"
 [dependencies]
 web3 = "0.19"
 tokio = { version = "1", features = ["full"] }
-alloy = { version = "0.12", features = ["full"] }
+alloy = { version = "0.13.0", features = ["rpc", "json_abi"] }
+alloy-primitives = {version = "0.6.4", features = ["address"]}
 dotenv = "0.15"
