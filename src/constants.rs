@@ -1,7 +1,7 @@
 use crate::types::{AppState, FeeAmount, PoolConfig, RpcConfig, Token};
 use alloy_primitives::Address;
 
-pub fn get_appstate() -> AppState {
+pub fn get_appstate(rpc_url: &str) -> AppState {
     let usdt = Token {
         address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
             .parse()
@@ -30,9 +30,7 @@ pub fn get_appstate() -> AppState {
     };
 
     AppState {
-        rpc: RpcConfig {
-            mainnet: ("https://mainnet.infura.io/v3/04490c8201d34cda8a14532c168b4d51"),
-        },
+        rpc: RpcConfig { mainnet: (rpc_url) },
         poolcfg: pool,
     }
 }

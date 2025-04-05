@@ -7,5 +7,9 @@ edition = "2024"
 web3 = "0.19"
 tokio = { version = "1", features = ["full"] }
 alloy = { version = "0.13.0", features = ["rpc", "json_abi"] }
+alloy-sol-types = "0.7"
+alloy-sol-macro = "0.7"
+alloy-provider = "0.7"
+alloy-json-abi = "0.7"
 alloy-primitives = {version = "0.6.4", features = ["address"]}
 dotenv = "0.15"

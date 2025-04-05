@@ -33,7 +33,7 @@ pub struct RpcConfig {
 
 #[derive(Debug, Clone)]
 
-pub struct AppState {
+pub struct AppConfig {
     pub rpc: RpcConfig,
     pub poolcfg: PoolConfig,
 }
