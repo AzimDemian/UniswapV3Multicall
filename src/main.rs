@@ -16,9 +16,17 @@ async fn main() {
     let rpc_url = env::var("RPC_URL")?;
     let provider = Provider::build(&rpc_url)?;
 
-    //Load abi of pool
-    let abi_str = file::read_to_string("abi/uniswap_pool.json")?;
-    let abi: JsonAbi = serde_json::from_str(&abi_str)?;
+    //Load abi
+    let keys = [
+        "MULTICALL_ABI_PATH",
+        "USDT_ABI_PATH",
+        "USDC_ABI_PATH",
+        "POOL_ABI_PATH",
+    ];
+
+    let abi: Abi = constants::initialize_abi(&keys).unwrap_or_else(|e| {
+        panic!("Failed to initialize ABIs: {e}");
+    });
 
     //Initializing config
 

@@ -1,3 +1,4 @@
+use alloy_json_abi::JsonAbi;
 use alloy_primitives::Address;
 
 #[derive(Debug, Clone)]
@@ -93,4 +94,31 @@ pub struct TickData {
     pub seconds_per_liquidity_outside_x128: u128,
     pub seconds_outside: u32,
     pub initialized: bool,
+}
+
+#[derive(Debug, Clone)]
+
+pub struct Abi {
+    pub usdt_abi: JsonAbi,
+    pub usdc_abi: JsonAbi,
+    pub uniswap_pool: JsonAbi,
+    pub multicall: JsonAbi,
+}
+
+impl Abi {
+    pub fn new(config: &[String]) -> Result<Self, Box<dyn std::error::Error>> {
+        fn parse(name: &str, content: &str) -> ethabi::Contract {
+            serde_json::from_str(content).unwrap_or_else(|e| {
+                eprintln!("Failed to parse {name} ABI: {e}");
+                panic!("Aborting due to invalid ABI");
+            })
+        }
+
+        Ok(Abi {
+            usdt_abi: parse("USDT", &config[0]),
+            usdc_abi: parse("USDC", &config[1]),
+            uniswap_pool: parse("POOL", &config[2]),
+            multicall: parse("MULTICALL", &config[3]),
+        })
+    }
 }

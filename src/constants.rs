@@ -1,5 +1,6 @@
-use crate::types::{AppState, FeeAmount, PoolConfig, RpcConfig, Token};
+use crate::types::{Abi, AppState, FeeAmount, PoolConfig, RpcConfig, Token};
 use alloy_primitives::Address;
+use std::{env, fs};
 
 pub fn get_appstate(rpc_url: &str) -> AppState {
     let usdt = Token {
@@ -33,4 +34,16 @@ pub fn get_appstate(rpc_url: &str) -> AppState {
         rpc: RpcConfig { mainnet: (rpc_url) },
         poolcfg: pool,
     }
+}
+
+pub fn initialize_abi(keys: &[&str]) -> Result<Abi, Box<dyn Error>> {
+    let config: Vec<String> = keys
+        .iter()
+        .map(|k| {
+            let path = env::var(k).map_err(|e| format!("Failed to read env key '{k}': {e}"))?;
+            fs::read_to_string(&path).map_err(|e| format!("Failed to read file at {path}: {e}"))
+        })
+        .collect::<Result<_, _>>()?;
+
+    Ok(Abi::new(&config))
 }
