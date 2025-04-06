@@ -1,5 +1,7 @@
-use alloy_json_abi::JsonAbi;
-use alloy_primitives::Address;
+use alloy::json_abi::Abi;
+use alloy::json_abi::JsonAbi;
+use alloy::primitives::Address;
+use alloy::primitives::U256;
 
 #[derive(Debug, Clone)]
 pub struct Token {
@@ -29,7 +31,7 @@ pub struct PoolConfig {
 
 #[derive(Debug, Clone)]
 pub struct RpcConfig {
-    pub mainnet: &String,
+    pub mainnet: String,
 }
 
 #[derive(Debug, Clone)]
@@ -43,8 +45,8 @@ pub struct AppConfig {
 pub struct PoolData {
     //Struct for state of Pool that we're intrested in
     pub address: Address,
-    pub token0: TokenData,
-    pub token1: TokenData,
+    pub token0: Token,
+    pub token1: Token,
     pub fee: u32,
     pub tick_spacing: i32,
     pub max_liquidity_per_tick: u128,
@@ -52,15 +54,6 @@ pub struct PoolData {
     pub slot0: Slot0,
     pub protocol_fees: ProtocolFees,
     pub ticks: Vec<TickData>,
-}
-
-#[derive(Debug, Clone)]
-pub struct TokenData {
-    //Struct for the current state of Token
-    pub name: String,
-    pub symbol: String,
-    pub decimals: u8,
-    pub address: Address,
 }
 
 #[derive(Debug, Clone)]
@@ -107,11 +100,8 @@ pub struct Abi {
 
 impl Abi {
     pub fn new(config: &[String]) -> Result<Self, Box<dyn std::error::Error>> {
-        fn parse(name: &str, content: &str) -> ethabi::Contract {
-            serde_json::from_str(content).unwrap_or_else(|e| {
-                eprintln!("Failed to parse {name} ABI: {e}");
-                panic!("Aborting due to invalid ABI");
-            })
+        fn parse(name: &str, content: &str) -> alloy::json_abi::Abi {
+            serde_json::from_str(content).map_err(|e| format!("Failed to parse {name} ABI: {e}"))?
         }
 
         Ok(Abi {
