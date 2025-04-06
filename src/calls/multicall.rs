@@ -1,6 +1,10 @@
 //Builder  of multicall
 use alloy::contract::Contract;
 
+pub fn multicall(){
+
+}
+
 pub fn get_pool_data(poolcfg: PoolConfig, app_state: AppState) -> PoolData {
 
     let usdt_data = 
