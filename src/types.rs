@@ -52,7 +52,6 @@ pub struct PoolData {
     pub max_liquidity_per_tick: u128,
     pub liquidity: u128,
     pub slot0: Slot0,
-    pub protocol_fees: ProtocolFees,
     pub ticks: Vec<TickData>,
 }
 
@@ -66,13 +65,6 @@ pub struct Slot0 {
     pub observation_cardinality_next: u16,
     pub fee_protocol: u8,
     pub unlocked: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct ProtocolFees {
-    //fees of tokens
-    pub token0: U256,
-    pub token1: U256,
 }
 
 #[derive(Debug, Clone)]

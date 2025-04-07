@@ -1,5 +1,6 @@
 mod constants;
 mod types;
+mod calls;
 use alloy::json_abi::JsonAbi;
 use alloy::primitives::Address;
 use alloy::providers::{Http, Provider};
