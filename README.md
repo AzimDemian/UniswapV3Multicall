@@ -1,6 +1,6 @@
 Multicall parser of data of Uniswap V3 USDC/USDT pull and tokens 
 
-1.Main starts executing
+1.Main starts executing\n
 2.Creating provider instance, based on created rpc_url
 3.Parse ABIs of contracts
 4.Creating the AppConfig, declared in types.rs, described and created by function in constants.rs
