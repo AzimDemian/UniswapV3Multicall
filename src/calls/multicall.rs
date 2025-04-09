@@ -3,7 +3,7 @@
 use alloy::{
     contract::{ContractInstance, Interface}, 
     primitives::{Address, Bytes, I256}, 
-    providers::RootProvider,
+    providers::fill::FillProvider,
     dyn_abi::DynSolValue,
 };
 use std::error::Error;
@@ -12,13 +12,13 @@ use crate::types::{Abi, PoolConfig, AppConfig, PoolData};
 
 
 
-pub fn make_multicall_contract(addr: Address, abi: &Abi, provider: &RootProvider) -> ContractInstance<RootProvider>{ 
+pub fn make_multicall_contract(addr: Address, abi: &Abi, provider: &FillProvider) -> ContractInstance<FillProvider>{ 
     //Initializing multicall contract
     let interface = Interface::new(abi.multicall.clone());
     ContractInstance::new(addr, provider.clone(), interface)
 }
 
-pub async fn initial_multicall(multicall_contract: &ContractInstance<RootProvider>, pool_contract: &ContractInstance<RootProvider>) -> Result<Vec<DynSolValue> , Box<dyn Error> >{
+pub async fn initial_multicall(multicall_contract: &ContractInstance<FillProvider>, pool_contract: &ContractInstance<FillProvider>) -> Result<Vec<DynSolValue> , Box<dyn Error> >{
     //Calling everything that can be straightforward put in PoolData and what will be used to calculate initialized Ticks
     let calls: Vec<(Address, Bytes)> = vec![
         pool_calls::prepare_call(pool_contract, "slot0", &[]).unwrap(),
@@ -48,8 +48,8 @@ pub async fn initial_multicall(multicall_contract: &ContractInstance<RootProvide
 
 pub async fn fetch_all_bitmaps(
     words: Vec<i16>, //We'll calculate with utils::calculate_bitmap_word_positions 
-    multicall_contract: &ContractInstance<RootProvider>,
-    pool_contract: &ContractInstance<RootProvider>,
+    multicall_contract: &ContractInstance<FillProvider>,
+    pool_contract: &ContractInstance<FillProvider>,
 ) -> Result<Vec<DynSolValue>, Box<dyn Error>> {
     let calls: Vec<(Address, Bytes)> = words
         .iter()
@@ -82,8 +82,8 @@ pub async fn fetch_all_bitmaps(
 
 pub async fn fetch_all_ticks(
     tick_indices: &[i32],
-    multicall_contract: &ContractInstance<RootProvider>,
-    pool_contract: &ContractInstance<RootProvider>,
+    multicall_contract: &ContractInstance<FillProvider>,
+    pool_contract: &ContractInstance<FillProvider>,
 ) -> Result<Vec<DynSolValue>, Box<dyn Error>> {
     let calls: Vec<(Address, Bytes)> = tick_indices
         .iter()
