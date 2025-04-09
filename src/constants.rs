@@ -1,4 +1,4 @@
-use crate::types::{Abi, AppConfig, FeeAmount, PoolConfig, RpcConfig, Token};
+use crate::types::{Abi, AppConfig, PoolConfig, RpcConfig, Token};
 use std::{env, error::Error};
 use tokio::fs;
 
@@ -28,7 +28,7 @@ pub fn get_appconfig(rpc_url: String) -> AppConfig {
             .unwrap(),
         token0: usdt,
         token1: usdc,
-        fee: FeeAmount::Low,
+        fee: 100,
     };
 
     AppConfig {

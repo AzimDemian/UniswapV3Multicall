@@ -12,22 +12,12 @@ pub struct Token {
 }
 
 #[derive(Debug, Clone)]
-
-pub enum FeeAmount {
-    //Enum, a bit redundant since only fee we need is Low, delete later
-    Low = 100,      // 0.01%
-    Medium0 = 500,  //0.05%
-    Medium1 = 3000, // 0.3%
-    High = 10000,   // 1%
-}
-
-#[derive(Debug, Clone)]
 pub struct PoolConfig {
     //Config of the pool, what we know about Pool beforhand
     pub address: Address,
     pub token0: Token,
     pub token1: Token,
-    pub fee: FeeAmount,
+    pub fee: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -50,7 +40,7 @@ pub struct PoolData {
     pub address: Address,
     pub token0: Token,
     pub token1: Token,
-    pub fee: u32,
+    pub fee: i32,
     pub tick_spacing: i32,
     pub max_liquidity_per_tick: u128,
     pub liquidity: u128,

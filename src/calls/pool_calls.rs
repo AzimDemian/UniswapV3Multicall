@@ -18,7 +18,7 @@ pub fn make_pool_contract<P: Provider<Ethereum> + Clone>(
     ContractInstance::new(addr, provider.clone(), interf)
 }
 
-pub fn prepare_call<P: Provider<Ethereum>>(
+pub fn prepare_call<P: Provider<Ethereum> + Clone>(
     //Function that prepares Eth call to later pass it to multicall
     contract: &ContractInstance<P>,
     method_name: &str,

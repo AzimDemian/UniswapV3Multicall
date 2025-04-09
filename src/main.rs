@@ -4,7 +4,7 @@ mod types;
 mod utils;
 
 use alloy::providers::ProviderBuilder;
-use calls::multicall::{get_pool_data, make_multicall_contract};
+use calls::multicall::make_multicall_contract;
 use calls::pool_calls::make_pool_contract;
 use constants::{get_appconfig, initialize_abi};
 use std::env;
@@ -44,7 +44,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //Fetch pool state via multicalls
     let pool_data = get_pool_data(
         &config.poolcfg,
-        &config,
         &abi,
         &provider,
         &pool_contract,
