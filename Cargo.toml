@@ -6,4 +6,7 @@ edition = "2024"
 [dependencies]
 tokio = { version = "1.44.2", features = ["rt-multi-thread", "macros", "fs"] }
 dotenv = "0.15"
-alloy = { version = "0.13", features = ["json-abi", "provider", "rpc", "serde"] }
+alloy = { version = "0.13", features = ["full"] }
+serde_json = "1.0.140"
+serde = "1.0.219"
+chrono = "0.4.40"

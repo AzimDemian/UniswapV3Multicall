@@ -1,9 +1,9 @@
-use crate::types::{Abi, AppState, FeeAmount, PoolConfig, RpcConfig, Token};
-use alloy::primitives::Address;
+use crate::types::{Abi, AppConfig, FeeAmount, PoolConfig, RpcConfig, Token};
 use std::{env, error::Error};
 use tokio::fs;
 
-pub fn get_appstate(rpc_url: str) -> AppState {
+pub fn get_appconfig(rpc_url: String) -> AppConfig {
+    //Initializing beforhand known info
     let usdt = Token {
         address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
             .parse()
@@ -31,25 +31,14 @@ pub fn get_appstate(rpc_url: str) -> AppState {
         fee: FeeAmount::Low,
     };
 
-    AppState {
+    AppConfig {
         rpc: RpcConfig { mainnet: (rpc_url) },
         poolcfg: pool,
     }
 }
 
-// pub fn initialize_abi(keys: &[&str]) -> Result<Abi, Box<dyn Error>> {
-//     let config: Vec<String> = keys
-//         .iter()
-//         .map(|k| {
-//             let path = env::var(k).map_err(|e| format!("Failed to read env key '{k}': {e}"))?;
-//             fs::read_to_string(&path).map_err(|e| format!("Failed to read file at {path}: {e}"))
-//         })
-//         .collect::<Result<_, _>>()?;
-
-//     Ok(Abi::new(&config))
-// }
-
 pub async fn initialize_abi(keys: &[&str]) -> Result<Abi, Box<dyn Error>> {
+    //Takes the path to ABI from .env and initialize ABIs used for project
     let mut config = Vec::with_capacity(keys.len());
 
     for &key in keys {

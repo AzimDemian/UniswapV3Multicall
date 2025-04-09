@@ -1,11 +1,10 @@
-use alloy::json_abi::Abi;
+use crate::utils;
 use alloy::json_abi::JsonAbi;
-use alloy::primitives::Address;
-use alloy::primitives::U256;
-
+use alloy::primitives::{Address, U256};
 #[derive(Debug, Clone)]
 pub struct Token {
-    //Token info
+    //Struct to hold token info (USDT/USDC are basic tokens, they don't take a fee for working with their contracts,
+    //so for tokens we know all info beforhand practically)
     pub address: Address,
     pub symbol: &'static str,
     pub name: &'static str,
@@ -15,6 +14,7 @@ pub struct Token {
 #[derive(Debug, Clone)]
 
 pub enum FeeAmount {
+    //Enum, a bit redundant since only fee we need is Low, delete later
     Low = 100,      // 0.01%
     Medium0 = 500,  //0.05%
     Medium1 = 3000, // 0.3%
@@ -23,6 +23,7 @@ pub enum FeeAmount {
 
 #[derive(Debug, Clone)]
 pub struct PoolConfig {
+    //Config of the pool, what we know about Pool beforhand
     pub address: Address,
     pub token0: Token,
     pub token1: Token,
@@ -31,19 +32,21 @@ pub struct PoolConfig {
 
 #[derive(Debug, Clone)]
 pub struct RpcConfig {
+    //To hold the value from .env
     pub mainnet: String,
 }
 
 #[derive(Debug, Clone)]
 
 pub struct AppConfig {
+    //Config of the app, what we know about app beforhand
     pub rpc: RpcConfig,
     pub poolcfg: PoolConfig,
 }
 
 #[derive(Debug, Clone)]
 pub struct PoolData {
-    //Struct for state of Pool that we're intrested in
+    //Struct that will be used to hold final parsed information about Pool
     pub address: Address,
     pub token0: Token,
     pub token1: Token,
@@ -57,7 +60,7 @@ pub struct PoolData {
 
 #[derive(Debug, Clone)]
 pub struct Slot0 {
-    //Struct for the current Slot0 info of the pool
+    //Struct that will be used to destruct Slot0 info
     pub sqrt_price_x96: U256,
     pub tick: i32,
     pub observation_index: u16,
@@ -69,7 +72,7 @@ pub struct Slot0 {
 
 #[derive(Debug, Clone)]
 pub struct TickData {
-    //data of ticks of observed Pool
+    //Struct that will be used to destruct data about single Tick
     pub tick_index: i32,
     pub liquidity_gross: u128,
     pub liquidity_net: i128,
@@ -84,6 +87,7 @@ pub struct TickData {
 #[derive(Debug, Clone)]
 
 pub struct Abi {
+    ///Struct that will be used to store Abi used in project
     pub usdt_abi: JsonAbi,
     pub usdc_abi: JsonAbi,
     pub uniswap_pool: JsonAbi,
@@ -92,15 +96,11 @@ pub struct Abi {
 
 impl Abi {
     pub fn new(config: &[String]) -> Result<Self, Box<dyn std::error::Error>> {
-        fn parse(name: &str, content: &str) -> alloy::json_abi::Abi {
-            serde_json::from_str(content).map_err(|e| format!("Failed to parse {name} ABI: {e}"))?
-        }
-
         Ok(Abi {
-            usdt_abi: parse("USDT", &config[0]),
-            usdc_abi: parse("USDC", &config[1]),
-            uniswap_pool: parse("POOL", &config[2]),
-            multicall: parse("MULTICALL", &config[3]),
+            usdt_abi: utils::parse("USDT", &config[0])?,
+            usdc_abi: utils::parse("USDC", &config[1])?,
+            uniswap_pool: utils::parse("POOL", &config[2])?,
+            multicall: utils::parse("MULTICALL", &config[3])?,
         })
     }
 }

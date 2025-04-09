@@ -1,57 +1,30 @@
 use crate::types::Abi;
-use alloy::contract::Contract;
+use alloy::contract::{ContractInstance, Interface};
+use alloy::dyn_abi::DynSolValue;
+use alloy::network::Ethereum;
 use alloy::primitives::{Address, Bytes};
-use alloy::providers::{Http, Provider};
+use alloy::providers::{Provider, RootProvider};
 use std::error::Error;
 
-pub fn make_pool_contract(addr: Address, abi: &Abi, provider: &Provider<Http>) -> Contract<Http> {
-    Contract::new(addr, &abi.uniswap_pool, provider)
+pub fn make_pool_contract(
+    //Creating pool contract (Probably should've made Abi as enum, and then struct that will store abis used in proj,
+    // would've been easier later on)
+    addr: Address,
+    abi: &Abi,
+    provider: &RootProvider,
+) -> ContractInstance<RootProvider> {
+    let interf = Interface::new(abi.uniswap_pool.clone());
+
+    ContractInstance::new(addr, provider.clone(), interf)
 }
 
-//prepare fetching slot0 data for multicall
-pub fn prepare_slot0_call(contract: &Contract<Http>) -> Result<(Address, Bytes), Box<dyn Error>> {
-    let call = contract.method::<_, Bytes>("slot0", ())?;
-    Ok((contract.address(), call.calldata()?))
-}
-
-//prepare fetching tick spacing data for multicall
-pub fn prepare_tick_spacing_call(
-    contract: &Contract<Http>,
+pub fn prepare_call<P: Provider<Ethereum>>(
+    //Function that prepares Eth call to later pass it to multicall
+    contract: &ContractInstance<P>,
+    method_name: &str,
+    args: &[DynSolValue],
 ) -> Result<(Address, Bytes), Box<dyn Error>> {
-    let call = contract.method::<_, Bytes>("tickSpacing", ())?;
-    Ok((contract.address(), call.calldata()?))
-}
-
-//prepare fetching liquidity data for multicall
-pub fn prepare_liquidity_call(
-    contract: &Contract<Http>,
-) -> Result<(Address, Bytes), Box<dyn Error>> {
-    let call = contract.method::<_, Bytes>("liquidity", ())?;
-    Ok((contract.address(), call.calldata()?))
-}
-
-//prepare fetching max liquidity per tick data for multicall
-pub fn prepare_max_liquidity_per_tick_call(
-    contract: &Contract<Http>,
-) -> Result<(Address, Bytes), Box<dyn Error>> {
-    let call = contract.method::<_, Bytes>("maxLiquidityPerTick", ())?;
-    Ok((contract.address(), call.calldata()?))
-}
-
-//prepare fetching bitmap by specific word data for multicall
-pub fn prepare_tick_bitmap_call(
-    contract: &Contract<Http>,
-    word_pos: i16,
-) -> Result<(Address, Bytes), Box<dyn Error>> {
-    let call = contract.method::<_, Bytes>("tickBitmap", word_pos)?;
-    Ok((contract.address(), call.calldata()?))
-}
-
-//prepare fetching ticks by index data for multicall
-pub fn prepare_tick_call(
-    contract: &Contract<Http>,
-    tick_index: i32,
-) -> Result<(Address, Bytes), Box<dyn Error>> {
-    let call = contract.method::<_, Bytes>("ticks", tick_index)?;
-    Ok((contract.address(), call.calldata()?))
+    let builder = contract.function(method_name, args)?;
+    let calldata = builder.calldata();
+    Ok((contract.address().clone(), calldata.clone()))
 }

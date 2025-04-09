@@ -1,42 +1,55 @@
+mod calls;
 mod constants;
 mod types;
-mod calls;
-use alloy::json_abi::JsonAbi;
-use alloy::primitives::Address;
-use alloy::providers::{Http, Provider};
-use std::str::FromStr;
+mod utils;
 
-use constants::get_appstate;
+use alloy::providers::ProviderBuilder;
+use calls::multicall::{get_pool_data, make_multicall_contract};
+use calls::pool_calls::make_pool_contract;
+use constants::{get_appconfig, initialize_abi};
 use std::env;
-use std::fs;
+use utils::log_pool_data;
 
 #[tokio::main]
-
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
 
-    //Load rpc url and provider
+    // 1. Load RPC URL and Provider
     let rpc_url = env::var("RPC_URL")?;
-    let provider = Provider::<Http>::try_from(rpc_url)?;
+    let provider = ProviderBuilder::new().http(&rpc_url)?;
 
-    //Load abi
+    // 2. Load ABIs from environment files
     let keys = [
         "MULTICALL_ABI_PATH",
         "USDT_ABI_PATH",
         "USDC_ABI_PATH",
         "POOL_ABI_PATH",
     ];
+    let abi = initialize_abi(&keys).await?;
 
-    let abi = constants::initialize_abi(&keys).await.unwrap_or_else(|e| {
-        eprintln!("ABI initialization failed: {e}");
-        std::process::exit(1);
-    });
+    // 3. Create config and contracts
+    let config = get_appconfig(rpc_url);
+    let pool_contract = make_pool_contract(config.poolcfg.address, &abi, &provider);
+    let multicall_contract = make_multicall_contract(
+        "0x5ba1e12693dc8f9c48aad8770482f4739beed696".parse()?,
+        &abi,
+        &provider,
+    );
 
-    //Initializing config
+    // 4. Fetch pool state via multicalls
+    let pool_data = get_pool_data(
+        &config.poolcfg,
+        &config,
+        &abi,
+        &provider,
+        &pool_contract,
+        &multicall_contract,
+    )
+    .await?;
 
-    let state: types::AppConfig = get_appstate(&rpc_url);
+    // 5. Print / Log
+    log_pool_data(&pool_data)?;
 
-    //Creating pool instance
-
-    let contract = abi.bind(state.poolcfg.address, provider);
+    println!("✔ Pool data written to PoolData.txt");
+    Ok(())
 }
