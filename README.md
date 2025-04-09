@@ -10,4 +10,4 @@ Multicall parser of data of Uniswap V3 USDC/USDT pull and tokens <br />
 8.Ask in one multicall about initialization of these bitmaps <br />
 9.Ask about specific ticks in one multicall <br />
 10.Construct Final PoolData in get_pool_data <br />
-11.Print that information
+11.Save that information in PoolData.txt
