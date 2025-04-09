@@ -176,27 +176,6 @@ pub fn extract_bytes(val: &DynSolValue) -> Option<Bytes> {
     }
 }
 
-// fn decode_slot0(value: &DynSolValue) -> Result<Slot0, Box<dyn std::error::Error>> {
-//     match value {
-//         DynSolValue::Tuple(values) if values.len() == 7 => Ok(Slot0 {
-//             sqrt_price_x96: values[0].as_uint().ok_or("Invalid sqrt_price_x96"),
-//             tick: values[1].as_int().ok_or("Invalid tick")? as i32,
-//             observation_index: values[2].as_uint().ok_or("Invalid observation_index")? as u16,
-//             observation_cardinality: values[3]
-//                 .as_uint()
-//                 .ok_or("Invalid observation_cardinality")?
-//                 as u16,
-//             observation_cardinality_next: values[4]
-//                 .as_uint()
-//                 .ok_or("Invalid observation_cardinality_next")?
-//                 as u16,
-//             fee_protocol: values[5].as_uint().ok_or("Invalid fee_protocol")? as u8,
-//             unlocked: values[6].as_bool().ok_or("Invalid unlocked flag")?,
-//         }),
-//         _ => Err("Expected slot0 to be a tuple with 7 elements".into()),
-//     }
-// }
-
 // fn decode_u128(value: &DynSolValue) -> Result<u128, Box<dyn std::error::Error>> {
 //     Ok(value.as_uint().ok_or("Expected uint for u128")?.as_limbs()[0])
 // }
