@@ -3,16 +3,16 @@ use alloy::contract::{ContractInstance, Interface};
 use alloy::dyn_abi::DynSolValue;
 use alloy::network::Ethereum;
 use alloy::primitives::{Address, Bytes};
-use alloy::providers::{Provider, RootProvider};
+use alloy::providers::Provider;
 use std::error::Error;
 
-pub fn make_pool_contract(
+pub fn make_pool_contract<P: Provider<Ethereum> + Clone>(
     //Creating pool contract (Probably should've made Abi as enum, and then struct that will store abis used in proj,
     // would've been easier later on)
     addr: Address,
     abi: &Abi,
-    provider: &RootProvider,
-) -> ContractInstance<RootProvider> {
+    provider: &impl Provider<Ethereum>,
+) -> ContractInstance<impl Provider<Ethereum>> {
     let interf = Interface::new(abi.uniswap_pool.clone());
 
     ContractInstance::new(addr, provider.clone(), interf)

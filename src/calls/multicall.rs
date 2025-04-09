@@ -2,40 +2,72 @@
 
 use alloy::{
     contract::{ContractInstance, Interface}, 
-    json_abi::JsonAbi, 
-    primitives::{Address, U256, Bytes}, 
+    primitives::{Address, Bytes, I256}, 
     providers::RootProvider,
     dyn_abi::DynSolValue,
-    sol_types::SolValue
 };
+use std::error::Error;
 use super::pool_calls::{self, prepare_call};
 use crate::types::{Abi, PoolConfig, AppConfig, PoolData};
 
 
 
 pub fn make_multicall_contract(addr: Address, abi: &Abi, provider: &RootProvider) -> ContractInstance<RootProvider>{ 
-    //
+    //Initializing multicall contract
     let interface = Interface::new(abi.multicall.clone());
     ContractInstance::new(addr, provider.clone(), interface)
 }
 
-pub async fn initial_multicall(multicall_contract: &ContractInstance<RootProvider>, pool_contract: &ContractInstance<RootProvider>) -> Result<(u64, Vec<Bytes>) , Box<dyn Error> >{
+pub async fn initial_multicall(multicall_contract: &ContractInstance<RootProvider>, pool_contract: &ContractInstance<RootProvider>) -> Result<Vec<DynSolValue> , Box<dyn Error> >{
+    //Calling everything that can be straightforward put in PoolData and what will be used to calculate initialized Ticks
     let calls: Vec<(Address, Bytes)> = vec![
-        // pool_calls::prepare_slot0_call(pool_contract),
-        // pool_calls::prepare_tick_spacing_call(pool_contract),
-        // pool_calls::prepare_liquidity_call(pool_contract),
-        // pool_calls::prepare_max_liquidity_per_tick_call(pool_contract),
         pool_calls::prepare_call(pool_contract, "slot0", &[]).unwrap(),
         pool_calls::prepare_call(pool_contract, "tickSpacing", &[]).unwrap(),
         pool_calls::prepare_call(pool_contract, "liquidity", &[]).unwrap(),
         pool_calls::prepare_call(pool_contract, "maxLiquidityPerTick", &[]).unwrap(),   
     ];
 
+    //Collecting arguments from prepared calls for single multicall
     let multicall_args: Vec<DynSolValue> = calls.iter()
         .map(|(address, calldata)| {
             DynSolValue::Tuple(vec![
                 DynSolValue::Address(*address),
-                DynSolValue::Bytes(calldata.clone()),
+                DynSolValue::Bytes(calldata.to_vec()),
+            ])
+        })
+        .collect();
+
+    //Proccessing with multicall
+    let result = multicall_contract
+        .function("aggregate", &[DynSolValue::Array(multicall_args)])?
+        .call()
+        .await?; 
+
+    Ok(result)
+}
+
+pub async fn fetch_all_bitmaps(
+    words: Vec<i16>, //We'll calculate with utils::calculate_bitmap_word_positions 
+    multicall_contract: &ContractInstance<RootProvider>,
+    pool_contract: &ContractInstance<RootProvider>,
+) -> Result<Vec<DynSolValue>, Box<dyn Error>> {
+    let calls: Vec<(Address, Bytes)> = words
+        .iter()
+        .map(|i| {
+            prepare_call(
+                pool_contract,
+                "tickBitmap",
+                &[DynSolValue::Int(I256::from(*i), 256)],
+            )
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let multicall_args: Vec<DynSolValue> = calls
+        .iter()
+        .map(|(address, calldata)| {
+            DynSolValue::Tuple(vec![
+                DynSolValue::Address(*address),
+                DynSolValue::Bytes(calldata.to_vec()),
             ])
         })
         .collect();
@@ -43,17 +75,43 @@ pub async fn initial_multicall(multicall_contract: &ContractInstance<RootProvide
     let result = multicall_contract
         .function("aggregate", &[DynSolValue::Array(multicall_args)])?
         .call()
-        .await?; 
-    
-    let (block_number, return_data): (u64, Vec<Bytes>) = result.decode();
+        .await?;
 
-    Ok((block_number, return_data));
+    Ok(result)
 }
 
-pub async fn fetch_all_bitmaps(words: Vec<i16>, multicall_contract: &ContractInstance<RootProvider>, pool_contract: &ContractInstance<RootProvider>) -> Result<(u64, Vec<Bytes>), Box<dyn Error>>{
-    let calls = words.iter().map(|i| {
-        prepare_call(pool_contract, "tickBitmap", i);
-    }).collect()?;
+pub async fn fetch_all_ticks(
+    tick_indices: &[i32],
+    multicall_contract: &ContractInstance<RootProvider>,
+    pool_contract: &ContractInstance<RootProvider>,
+) -> Result<Vec<DynSolValue>, Box<dyn Error>> {
+    let calls: Vec<(Address, Bytes)> = tick_indices
+        .iter()
+        .map(|i| {
+            prepare_call(
+                pool_contract,
+                "ticks",
+                &[DynSolValue::Int(I256::from(*i), 24)],
+            )
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let multicall_args: Vec<DynSolValue> = calls
+        .iter()
+        .map(|(address, calldata)| {
+            DynSolValue::Tuple(vec![
+                DynSolValue::Address(*address),
+                DynSolValue::Bytes(calldata.to_vec()),
+            ])
+        })
+        .collect();
+
+    let result = multicall_contract
+        .function("aggregate", &[DynSolValue::Array(multicall_args)])?
+        .call()
+        .await?;
+
+    Ok(result)
 }
 
 pub fn get_pool_data(poolcfg: PoolConfig, app_state: AppConfig) -> PoolData {

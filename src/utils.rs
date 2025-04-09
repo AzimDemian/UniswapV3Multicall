@@ -1,4 +1,6 @@
 use crate::types::PoolData;
+use alloy::dyn_abi::SolType;
+use alloy::primitives::{Bytes, U256};
 use chrono::Local;
 use std::collections::HashSet;
 use std::error::Error;
@@ -115,6 +117,40 @@ pub fn calculate_bitmap_word_positions(
     let mut result: Vec<i16> = positions.into_iter().collect();
     result.sort_unstable();
     Ok(result)
+}
+
+pub fn get_initialized_ticks(
+    word_positions: &[i16],
+    bitmaps: &[U256],
+    tick_spacing: i32,
+) -> Vec<i32> {
+    let mut initialized_ticks = Vec::new();
+
+    for (j, &bitmap) in bitmaps.iter().enumerate() {
+        if bitmap == U256::ZERO {
+            continue;
+        }
+
+        let word_index = word_positions[j] as i32;
+
+        for i in 0..256 {
+            let bit = U256::from(1) << i;
+            let is_initialized = bitmap & bit != U256::ZERO;
+
+            if is_initialized {
+                let tick_index = (word_index * 256 + i) * tick_spacing;
+                initialized_ticks.push(tick_index);
+            }
+        }
+    }
+
+    initialized_ticks
+}
+
+pub fn decode_response<T: SolType>(
+    data: Bytes,
+) -> Result<<T as SolType>::RustType, Box<dyn std::error::Error>> {
+    T::abi_decode(&data, true).map_err(|e| e.into())
 }
 
 pub fn parse(
