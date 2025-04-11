@@ -2,24 +2,24 @@
 use super::pool_calls::prepare_call;
 use crate::utils::{
     calculate_bitmap_word_positions, decode_i32_token, decode_slot0_tokens, decode_ticks,
-    decode_u128_token, decode_u256_token, encode_signed_i16_to_token, get_initialized_ticks,
+    decode_u128_token, decode_u256_token, get_initialized_ticks,
 };
 
 use crate::types::{PoolConfig, PoolData, TickData};
 use std::error::Error;
 use web3::{
-    contract::{Contract, Options},
+    contract::Contract,
     ethabi::{Function, Token},
     transports::Http,
     types::{Bytes, CallRequest, U256},
 };
 
 pub async fn initial_multicall(
+    //Multicall that gets the slot0, tickSpacing, liquidity, maxLiquidityPerTick information of pool
     web3: &web3::Web3<Http>,
     multicall_contract: &Contract<Http>,
     pool_contract: &Contract<Http>,
 ) -> Result<Vec<Bytes>, Box<dyn Error>> {
-    // Создание вызовов к методам контракта пула
     let calls: Vec<Token> = vec![
         prepare_call(pool_contract, "slot0", ()).await?,
         prepare_call(pool_contract, "tickSpacing", ()).await?,

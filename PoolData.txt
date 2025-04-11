@@ -1,4 +1,4 @@
-Time: 2025-04-11 23:24:22
+Time: 2025-04-11 23:51:15
 Pool Address: 0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf
 Fee: 500 (in hundredths of a bip)
 Tick Spacing: 10

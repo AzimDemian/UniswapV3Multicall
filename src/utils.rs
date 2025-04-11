@@ -122,6 +122,7 @@ pub fn calculate_bitmap_word_positions(
 }
 
 pub fn get_initialized_ticks(
+    //Goes through non-zero bitmaps and in each seeks for initialized ticks
     word_positions: &[i16],
     bitmaps: &[U256],
     tick_spacing: i32,
@@ -146,10 +147,11 @@ pub fn get_initialized_ticks(
         }
     }
 
-    initialized_ticks
+    initialized_ticks //Vec of positions of initialized tickc
 }
 
 pub async fn make_contract(
+    //Based on Http Web3 Provider and abi creates contract instance
     web3: &web3::Web3<Http>,
     addr: Address,
     abi_path: &str,
@@ -160,6 +162,7 @@ pub async fn make_contract(
 }
 
 pub fn decode_call_result(
+    //Decode Bytes result of call to Token type
     contract: &Contract<Http>,
     method_name: &str,
     data: &Bytes,
@@ -280,10 +283,4 @@ pub fn decode_ticks(
     }
 
     Ok(decoded)
-}
-
-pub fn encode_signed_i16_to_token(n: i16) -> Token {
-    let mut buf = [0u8; 32];
-    buf[30..32].copy_from_slice(&n.to_be_bytes());
-    Token::Int(U256::from_big_endian(&buf))
 }
