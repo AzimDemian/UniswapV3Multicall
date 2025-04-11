@@ -1,170 +1,205 @@
 //Builder  of multicalls
 
-use super::pool_calls::{self, prepare_call};
-use crate::{
-    types::{Abi, AppConfig, PoolConfig, PoolData},
-    utils,
+use super::pool_calls::prepare_call;
+use crate::utils::{
+    calculate_bitmap_word_positions, decode_i32_token, decode_slot0_tokens, decode_ticks,
+    decode_u128_token, decode_u256_token, get_initialized_ticks,
 };
-use alloy::{
-    contract::{ContractInstance, Interface},
-    dyn_abi::DynSolValue,
-    network::Ethereum,
-    primitives::{Address, Bytes},
-    providers::Provider,
-};
+
+use crate::types::{PoolConfig, PoolData, TickData};
 use std::error::Error;
+use web3::{
+    contract::{Contract, Options},
+    ethabi::{Function, Token},
+    transports::Http,
+    types::{Bytes, CallRequest, U256},
+};
 
-pub fn make_multicall_contract<P>(addr: Address, abi: &Abi, provider: &P) -> ContractInstance<P>
-where
-    P: Provider<Ethereum> + Clone,
-{
-    //Initializing multicall contract
-    let interface = Interface::new(abi.multicall.clone());
-    ContractInstance::new(addr, provider.clone(), interface)
-}
+pub async fn initial_multicall(
+    web3: &web3::Web3<Http>,
+    multicall_contract: &Contract<Http>,
+    pool_contract: &Contract<Http>,
+) -> Result<Vec<Bytes>, Box<dyn Error>> {
+    // Создание вызовов к методам контракта пула
+    let calls: Vec<Token> = vec![
+        prepare_call(pool_contract, "slot0", ()).await?,
+        prepare_call(pool_contract, "tickSpacing", ()).await?,
+        prepare_call(pool_contract, "liquidity", ()).await?,
+        prepare_call(pool_contract, "maxLiquidityPerTick", ()).await?,
+    ]
+    .into_iter()
+    .map(|(addr, data)| Token::Tuple(vec![Token::Address(addr), Token::Bytes(data.0)]))
+    .collect();
 
-pub async fn initial_multicall<P>(
-    multicall_contract: &ContractInstance<P>,
-    pool_contract: &ContractInstance<P>,
-) -> Result<Vec<DynSolValue>, Box<dyn Error>>
-where
-    P: Provider<Ethereum> + Clone,
-{
-    //Calling everything that can be straightforward put in PoolData and what will be used to calculate initialized Ticks
-    let calls: Vec<(Address, Bytes)> = vec![
-        pool_calls::prepare_call(pool_contract, "slot0", &[]).unwrap(),
-        pool_calls::prepare_call(pool_contract, "tickSpacing", &[]).unwrap(),
-        pool_calls::prepare_call(pool_contract, "liquidity", &[]).unwrap(),
-        pool_calls::prepare_call(pool_contract, "maxLiquidityPerTick", &[]).unwrap(),
-    ];
+    let args = vec![Token::Array(calls)];
 
-    //Collecting arguments from prepared calls for single multicall
-    let multicall_args: Vec<DynSolValue> = calls
-        .iter()
-        .map(|(address, calldata)| {
-            DynSolValue::Tuple(vec![
-                DynSolValue::Address(*address),
-                DynSolValue::Bytes(calldata.to_vec()),
-            ])
-        })
-        .collect();
+    // get the func from abi of multicall
+    let aggregate_fn: &Function = multicall_contract.abi().function("aggregate")?;
 
-    //Proccessing with multicall
-    let result = multicall_contract
-        .function("aggregate", &[DynSolValue::Array(multicall_args)])?
-        .call()
-        .await?;
+    // encoding of input
+    let calldata = aggregate_fn.encode_input(&args)?;
 
-    Ok(result)
-}
+    // Rpc reqwest creation
+    let call_request = CallRequest {
+        to: Some(multicall_contract.address()),
+        data: Some(Bytes(calldata.clone())),
+        ..Default::default()
+    };
 
-pub async fn fetch_all_bitmaps<P>(
-    words: Vec<i16>, //We'll calculate with utils::calculate_bitmap_word_positions
-    multicall_contract: &ContractInstance<P>,
-    pool_contract: &ContractInstance<P>,
-) -> Result<Vec<DynSolValue>, Box<dyn Error>>
-where
-    P: Provider<Ethereum> + Clone,
-{
-    let calls: Vec<(Address, Bytes)> = words
-        .iter()
-        .map(|i| {
-            prepare_call(
-                pool_contract,
-                "tickBitmap",
-                &[DynSolValue::Int(utils::i16_to_i256(*i), 256)],
-            )
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let raw_output = web3.eth().call(call_request, None).await?;
 
-    let multicall_args: Vec<DynSolValue> = calls
-        .iter()
-        .map(|(address, calldata)| {
-            DynSolValue::Tuple(vec![
-                DynSolValue::Address(*address),
-                DynSolValue::Bytes(calldata.to_vec()),
-            ])
-        })
-        .collect();
+    // Decode ruesult
+    let decoded_tokens = aggregate_fn.decode_output(&raw_output.0)?;
 
-    let result = multicall_contract
-        .function("aggregate", &[DynSolValue::Array(multicall_args)])?
-        .call()
-        .await?;
+    // Getting the result of call
+    if let [Token::Uint(_block), Token::Array(result_tokens)] = decoded_tokens.as_slice() {
+        let result_bytes = result_tokens
+            .iter()
+            .map(|token| match token {
+                Token::Bytes(data) => Ok(Bytes::from(data.clone())),
+                _ => Err("Expected Token::Bytes".into()),
+            })
+            .collect::<Result<Vec<Bytes>, Box<dyn Error>>>()?;
 
-    Ok(result)
-}
-
-pub async fn fetch_all_ticks<P>(
-    tick_indices: &[i32],
-    multicall_contract: &ContractInstance<P>,
-    pool_contract: &ContractInstance<P>,
-) -> Result<Vec<DynSolValue>, Box<dyn Error>>
-where
-    P: Provider<Ethereum> + Clone,
-{
-    let calls = tick_indices
-        .iter()
-        .map(|i| {
-            prepare_call(
-                pool_contract,
-                "ticks",
-                &[DynSolValue::Int(utils::i32_to_i256(*i), 256)],
-            )
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-
-    let multicall_args: Vec<DynSolValue> = calls
-        .iter()
-        .map(|(address, calldata)| {
-            DynSolValue::Tuple(vec![
-                DynSolValue::Address(*address),
-                DynSolValue::Bytes(calldata.to_vec()),
-            ])
-        })
-        .collect();
-
-    let result = multicall_contract
-        .function("aggregate", &[DynSolValue::Array(multicall_args)])?
-        .call()
-        .await?;
-
-    Ok(result)
-}
-
-pub async fn get_pool_data <P: Provider<Ethereum> + Clone>
-    (poolcfg: &PoolConfig, 
-    abi: &Abi, provider: &P, 
-    pool_contract: &ContractInstance<P>, 
-    multicall_contract: &ContractInstance<P> ) -> PoolData {
-
-    let initial_data: Vec<DynSolValue> = initial_multicall(multicall_contract, pool_contract)
-        .await
-        .unwrap()
-        .iter()
-        .map(|x| {
-            match utils::extract_bytes(x) {
-                Some(bytes) => utils::decode_response(bytes), // <- Result<DynSolValue, Box<dyn Error>>
-                None => Err("Expected bytes but got None".into()),
-            }
-        })
-        .collect::<Result<Vec<_>, Box<dyn Error>>>()
-        .unwrap();
-
-
-    
-
-    PoolData {
-        address: poolcfg.address,
-        token0: poolcfg.token0,
-        token1: poolcfg.token1,
-        fee: poolcfg.fee,
-        tick_spacing: ,
-        max_liquidity_per_tick: ,
-        liquidity: ,
-        slot0: ,
-        protocol_fees: ,
-        ticks:
-
+        Ok(result_bytes)
+    } else {
+        Err("Unexpected output format from aggregate".into())
     }
+}
+
+pub async fn fetch_all_bitmaps(
+    word_positions: &[i16],
+    multicall: &Contract<Http>,
+    pool: &Contract<Http>,
+) -> Result<Vec<Bytes>, Box<dyn Error>> {
+    let calls: Vec<Token> = word_positions
+        .iter()
+        .map(|&pos| {
+            let calldata = pool
+                .abi()
+                .function("tickBitmap")?
+                .encode_input(&[Token::Int(pos.into())])?;
+            Ok(Token::Tuple(vec![
+                Token::Address(pool.address()),
+                Token::Bytes(calldata),
+            ]))
+        })
+        .collect::<Result<Vec<_>, web3::ethabi::Error>>()?;
+
+    let args = (Token::Array(calls),);
+
+    let raw_output: Bytes = multicall
+        .query("aggregate", args, None, Options::default(), None)
+        .await?;
+
+    let decoded_tokens = multicall
+        .abi()
+        .function("aggregate")?
+        .decode_output(&raw_output.0)?;
+
+    if let [Token::Uint(_block), Token::Array(result_tokens)] = decoded_tokens.as_slice() {
+        let result: Vec<Bytes> = result_tokens
+            .iter()
+            .map(|t| match t {
+                Token::Bytes(b) => Bytes(b.clone()),
+                _ => panic!("Unexpected token format"),
+            })
+            .collect();
+        Ok(result)
+    } else {
+        Err("Invalid return data from multicall".into())
+    }
+}
+
+/// Fetches all ticks for the given tick indices using multicall
+pub async fn fetch_all_ticks(
+    tick_indices: &[i32],
+    multicall: &Contract<Http>,
+    pool: &Contract<Http>,
+) -> Result<Vec<Bytes>, Box<dyn Error>> {
+    let calls: Vec<Token> = tick_indices
+        .iter()
+        .map(|&tick| {
+            let calldata = pool
+                .abi()
+                .function("ticks")?
+                .encode_input(&[Token::Int(tick.into())])?;
+            Ok(Token::Tuple(vec![
+                Token::Address(pool.address()),
+                Token::Bytes(calldata),
+            ]))
+        })
+        .collect::<Result<Vec<_>, web3::ethabi::Error>>()?;
+
+    let args = (Token::Array(calls),);
+
+    let raw_output: Bytes = multicall
+        .query("aggregate", args, None, Options::default(), None)
+        .await?;
+
+    let decoded_tokens = multicall
+        .abi()
+        .function("aggregate")?
+        .decode_output(&raw_output.0)?;
+
+    if let [Token::Uint(_block), Token::Array(result_tokens)] = decoded_tokens.as_slice() {
+        let result: Vec<Bytes> = result_tokens
+            .iter()
+            .map(|t| match t {
+                Token::Bytes(b) => Bytes(b.clone()),
+                _ => panic!("Unexpected token format"),
+            })
+            .collect();
+        Ok(result)
+    } else {
+        Err("Invalid return data from multicall".into())
+    }
+}
+
+pub async fn get_pool_data(
+    poolcfg: &PoolConfig,
+    pool: &Contract<Http>,
+    multicall: &Contract<Http>,
+    web3: &web3::Web3<Http>,
+) -> Result<PoolData, Box<dyn Error>> {
+    // Step 1: Initial multicall (slot0, tickSpacing, liquidity, maxLiquidityPerTick)
+    let initial_responses = initial_multicall(web3, multicall, pool).await?;
+
+    // Step 2: Decode each
+    let slot0 = decode_slot0_tokens(pool, "slot0", &initial_responses[0])?;
+    let tick_spacing = decode_i32_token(pool, "tickSpacing", &initial_responses[1])?;
+    let liquidity = decode_u128_token(pool, "liquidity", &initial_responses[2])?;
+    let max_liquidity_per_tick =
+        decode_u128_token(pool, "maxLiquidityPerTick", &initial_responses[3])?;
+
+    // Step 3: Tick bitmap word positions
+    let word_positions = calculate_bitmap_word_positions(-887272, 887272, tick_spacing)?; // this can be dynamic later
+
+    // Step 4: Fetch bitmaps
+    let bitmap_responses = fetch_all_bitmaps(&word_positions, multicall, pool).await?;
+    let bitmap_u256s = bitmap_responses
+        .iter()
+        .map(|x| decode_u256_token(pool, "tickBitmap", x))
+        .collect::<Result<Vec<U256>, _>>()?;
+
+    // Step 5: Get all initialized tick indices
+    let initialized_tick_indices =
+        get_initialized_ticks(&word_positions, &bitmap_u256s, tick_spacing);
+
+    // Step 6: Fetch tick data
+    let ticks_bytes = fetch_all_ticks(&initialized_tick_indices, multicall, pool).await?;
+    let ticks: Vec<TickData> = decode_ticks(&initialized_tick_indices, &ticks_bytes, pool)?;
+
+    // Step 7: Collect everything
+    Ok(PoolData {
+        address: poolcfg.address,
+        token0: poolcfg.token0.clone(),
+        token1: poolcfg.token1.clone(),
+        fee: poolcfg.fee,
+        tick_spacing,
+        max_liquidity_per_tick,
+        liquidity,
+        slot0,
+        ticks,
+    })
 } //function that returns data that we're intreseted in

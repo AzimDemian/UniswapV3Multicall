@@ -1,15 +1,17 @@
-use crate::types::{PoolData, Slot0};
-use alloy::dyn_abi::{DynSolValue, SolType};
-use alloy::primitives::{Bytes, I256, U256};
+use crate::types::{PoolData, Slot0, TickData};
 use chrono::Local;
 use std::collections::HashSet;
 use std::error::Error;
-use std::fs::OpenOptions;
+use std::fs;
 use std::io::Write;
+use web3::contract::Contract;
+use web3::ethabi::{Function, Token};
+use web3::transports::Http;
+use web3::types::{Address, Bytes, U256};
 
 pub fn log_pool_data(pool: &PoolData) -> std::io::Result<()> {
     //Function used to log current state of Pool into file PoolData.txt
-    let mut file = OpenOptions::new()
+    let mut file = fs::OpenOptions::new()
         .append(true)
         .create(true)
         .open("PoolData.txt")?;
@@ -127,7 +129,7 @@ pub fn get_initialized_ticks(
     let mut initialized_ticks = Vec::new();
 
     for (j, &bitmap) in bitmaps.iter().enumerate() {
-        if bitmap == U256::ZERO {
+        if bitmap == U256::zero() {
             continue;
         }
 
@@ -135,7 +137,7 @@ pub fn get_initialized_ticks(
 
         for i in 0..256 {
             let bit = U256::from(1) << i;
-            let is_initialized = bitmap & bit != U256::ZERO;
+            let is_initialized = bitmap & bit != U256::zero();
 
             if is_initialized {
                 let tick_index = (word_index * 256 + i) * tick_spacing;
@@ -147,39 +149,135 @@ pub fn get_initialized_ticks(
     initialized_ticks
 }
 
-pub fn decode_response<T: SolType>(
-    data: Bytes,
-) -> Result<<T as SolType>::RustType, Box<dyn std::error::Error>> {
-    T::abi_decode(&data, true).map_err(|e| e.into())
+pub async fn make_contract(
+    web3: &web3::Web3<Http>,
+    addr: Address,
+    abi_path: &str,
+) -> Result<Contract<Http>, Box<dyn Error>> {
+    let abi_json = fs::read_to_string(abi_path)?;
+    let contract = Contract::from_json(web3.eth(), addr, abi_json.as_bytes())?;
+    Ok(contract)
 }
 
-pub fn parse(
-    //Parser of JSON Abi
-    name: &str,
-    content: &str,
-) -> Result<alloy::json_abi::JsonAbi, Box<dyn std::error::Error>> {
-    serde_json::from_str(content).map_err(|e| format!("Failed to parse {name} ABI: {e}").into())
+pub fn decode_call_result(
+    contract: &Contract<Http>,
+    method_name: &str,
+    data: &Bytes,
+) -> Result<Vec<Token>, Box<dyn Error>> {
+    let func: &Function = contract
+        .abi()
+        .function(method_name)
+        .map_err(|e| format!("Function {} not found: {}", method_name, e))?;
+
+    let decoded = func
+        .decode_output(&data.0)
+        .map_err(|e| format!("Decode failed for {}: {}", method_name, e))?;
+
+    Ok(decoded)
 }
 
-pub fn i32_to_i256(val: i32) -> I256 {
-    I256::from_raw(alloy::primitives::U256::from(val as i128))
-}
-
-pub fn i16_to_i256(val: i16) -> I256 {
-    I256::from_raw(alloy::primitives::U256::from(val as i128))
-}
-
-pub fn extract_bytes(val: &DynSolValue) -> Option<Bytes> {
-    match val {
-        DynSolValue::Bytes(bytes) => Some(bytes.clone().into()),
-        _ => None,
+pub fn decode_u128_token(
+    contract: &Contract<Http>,
+    method: &str,
+    data: &Bytes,
+) -> Result<u128, Box<dyn Error>> {
+    let tokens = decode_call_result(contract, method, data)?;
+    match tokens.get(0) {
+        Some(Token::Uint(val)) => Ok(val.as_u128()),
+        _ => Err("Expected u128 token".into()),
     }
 }
 
-// fn decode_u128(value: &DynSolValue) -> Result<u128, Box<dyn std::error::Error>> {
-//     Ok(value.as_uint().ok_or("Expected uint for u128")?.as_limbs()[0])
-// }
+pub fn decode_i32_token(
+    contract: &Contract<Http>,
+    method: &str,
+    data: &Bytes,
+) -> Result<i32, Box<dyn Error>> {
+    let tokens = decode_call_result(contract, method, data)?;
+    match tokens.get(0) {
+        Some(Token::Int(val)) => Ok(val.low_u32() as i32),
+        _ => Err("Expected i32 token".into()),
+    }
+}
 
-// fn decode_i32(value: &DynSolValue) -> Result<i32, Box<dyn std::error::Error>> {
-//     Ok(value.as_int().ok_or("Expected int for i32")? as i32)
-// }
+pub fn decode_slot0_tokens(
+    contract: &Contract<Http>,
+    method: &str,
+    data: &Bytes,
+) -> Result<Slot0, Box<dyn Error>> {
+    let tokens = decode_call_result(contract, method, data)?;
+    if let [
+        Token::Uint(sqrt_price_x96),
+        Token::Int(tick),
+        Token::Uint(observation_index),
+        Token::Uint(observation_cardinality),
+        Token::Uint(observation_cardinality_next),
+        Token::Uint(fee_protocol),
+        Token::Bool(unlocked),
+    ] = tokens.as_slice()
+    {
+        Ok(Slot0 {
+            sqrt_price_x96: (*sqrt_price_x96).into(),
+            tick: tick.low_u32() as i32,
+            observation_index: observation_index.low_u32() as u16,
+            observation_cardinality: observation_cardinality.low_u32() as u16,
+            observation_cardinality_next: observation_cardinality_next.low_u32() as u16,
+            fee_protocol: fee_protocol.low_u32() as u8,
+            unlocked: *unlocked,
+        })
+    } else {
+        Err("Unexpected Slot0 token structure".into())
+    }
+}
+
+pub fn decode_u256_token(
+    contract: &Contract<Http>,
+    method: &str,
+    data: &Bytes,
+) -> Result<U256, Box<dyn Error>> {
+    let tokens = decode_call_result(contract, method, data)?;
+    match tokens.get(0) {
+        Some(Token::Uint(val)) => Ok(*val),
+        _ => Err(format!("Expected Token::Uint from {}", method).into()),
+    }
+}
+
+pub fn decode_ticks(
+    indices: &[i32],
+    raw_results: &[Bytes],
+    pool: &Contract<Http>,
+) -> Result<Vec<TickData>, Box<dyn Error>> {
+    let mut decoded = Vec::with_capacity(raw_results.len());
+
+    for (i, bytes) in raw_results.iter().enumerate() {
+        let tokens = decode_call_result(pool, "ticks", bytes)?;
+
+        if let [
+            Token::Uint(liquidity_gross),
+            Token::Int(liquidity_net),
+            Token::Uint(fee_growth_outside_0),
+            Token::Uint(fee_growth_outside_1),
+            Token::Int(tick_cumulative_outside),
+            Token::Uint(seconds_per_liquidity_outside),
+            Token::Uint(seconds_outside),
+            Token::Bool(initialized),
+        ] = tokens.as_slice()
+        {
+            decoded.push(TickData {
+                tick_index: indices[i],
+                liquidity_gross: liquidity_gross.as_u128(),
+                liquidity_net: liquidity_net.low_u128() as i128,
+                fee_growth_outside_0_x128: *fee_growth_outside_0,
+                fee_growth_outside_1_x128: *fee_growth_outside_1,
+                tick_cumulative_outside: tick_cumulative_outside.low_u64() as i64,
+                seconds_per_liquidity_outside_x128: seconds_per_liquidity_outside.as_u128(),
+                seconds_outside: seconds_outside.as_u32(),
+                initialized: *initialized,
+            });
+        } else {
+            return Err(format!("Unexpected ticks token structure at index {}", i).into());
+        }
+    }
+
+    Ok(decoded)
+}

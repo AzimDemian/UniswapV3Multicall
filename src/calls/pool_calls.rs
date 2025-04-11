@@ -1,30 +1,16 @@
-use crate::types::Abi;
-use alloy::contract::{ContractInstance, Interface};
-use alloy::dyn_abi::DynSolValue;
-use alloy::network::Ethereum;
-use alloy::primitives::{Address, Bytes};
-use alloy::providers::Provider;
 use std::error::Error;
+use web3::contract::Contract;
+use web3::contract::tokens::Tokenize;
+use web3::types::{Address, Bytes};
 
-pub fn make_pool_contract<P: Provider<Ethereum> + Clone>(
-    //Creating pool contract (Probably should've made Abi as enum, and then struct that will store abis used in proj,
-    // would've been easier later on)
-    addr: Address,
-    abi: &Abi,
-    provider: &impl Provider<Ethereum>,
-) -> ContractInstance<impl Provider<Ethereum>> {
-    let interf = Interface::new(abi.uniswap_pool.clone());
+// Создаёт контракт пула из ABI и адреса
 
-    ContractInstance::new(addr, provider.clone(), interf)
-}
-
-pub fn prepare_call<P: Provider<Ethereum> + Clone>(
-    //Function that prepares Eth call to later pass it to multicall
-    contract: &ContractInstance<P>,
-    method_name: &str,
-    args: &[DynSolValue],
+pub async fn prepare_call<T: Tokenize>(
+    contract: &Contract<web3::transports::Http>,
+    method: &str,
+    args: T,
 ) -> Result<(Address, Bytes), Box<dyn Error>> {
-    let builder = contract.function(method_name, args)?;
-    let calldata = builder.calldata();
-    Ok((contract.address().clone(), calldata.clone()))
+    let function = contract.abi().function(method)?;
+    let calldata = function.encode_input(&args.into_tokens())?;
+    Ok((contract.address(), Bytes(calldata)))
 }

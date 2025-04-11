@@ -1,8 +1,7 @@
-use crate::utils;
-use alloy::json_abi::JsonAbi;
-use alloy::primitives::{Address, U256};
+use web3::types::{Address, U256};
+
 #[derive(Debug, Clone)]
-pub struct Token {
+pub struct Tokend {
     //Struct to hold token info (USDT/USDC are basic tokens, they don't take a fee for working with their contracts,
     //so for tokens we know all info beforhand practically)
     pub address: Address,
@@ -15,31 +14,17 @@ pub struct Token {
 pub struct PoolConfig {
     //Config of the pool, what we know about Pool beforhand
     pub address: Address,
-    pub token0: Token,
-    pub token1: Token,
+    pub token0: Tokend,
+    pub token1: Tokend,
     pub fee: i32,
-}
-
-#[derive(Debug, Clone)]
-pub struct RpcConfig {
-    //To hold the value from .env
-    pub mainnet: String,
-}
-
-#[derive(Debug, Clone)]
-
-pub struct AppConfig {
-    //Config of the app, what we know about app beforhand
-    pub rpc: RpcConfig,
-    pub poolcfg: PoolConfig,
 }
 
 #[derive(Debug, Clone)]
 pub struct PoolData {
     //Struct that will be used to hold final parsed information about Pool
     pub address: Address,
-    pub token0: Token,
-    pub token1: Token,
+    pub token0: Tokend,
+    pub token1: Tokend,
     pub fee: i32,
     pub tick_spacing: i32,
     pub max_liquidity_per_tick: u128,
@@ -72,25 +57,4 @@ pub struct TickData {
     pub seconds_per_liquidity_outside_x128: u128,
     pub seconds_outside: u32,
     pub initialized: bool,
-}
-
-#[derive(Debug, Clone)]
-
-pub struct Abi {
-    ///Struct that will be used to store Abi used in project
-    pub usdt_abi: JsonAbi,
-    pub usdc_abi: JsonAbi,
-    pub uniswap_pool: JsonAbi,
-    pub multicall: JsonAbi,
-}
-
-impl Abi {
-    pub fn new(config: &[String]) -> Result<Self, Box<dyn std::error::Error>> {
-        Ok(Abi {
-            usdt_abi: utils::parse("USDT", &config[0])?,
-            usdc_abi: utils::parse("USDC", &config[1])?,
-            uniswap_pool: utils::parse("POOL", &config[2])?,
-            multicall: utils::parse("MULTICALL", &config[3])?,
-        })
-    }
 }
