@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         env::var(keys[0]).map_err(|e| format!("Failed to read env key 'POOL_ABI_PATH': {e}"))?;
 
     let multicall_abi_path =
-        env::var(keys[0]).map_err(|e| format!("Failed to read env key 'POOL_ABI_PATH': {e}"))?;
+        env::var(keys[1]).map_err(|e| format!("Failed to read env key 'POOL_ABI_PATH': {e}"))?;
 
     println!("POOL abi: {pool_abi_path}, MULTICALL abi: {multicall_abi_path}");
     // Load pool configuration

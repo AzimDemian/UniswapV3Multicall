@@ -281,3 +281,9 @@ pub fn decode_ticks(
 
     Ok(decoded)
 }
+
+pub fn encode_signed_i16_to_token(n: i16) -> Token {
+    let mut buf = [0u8; 32];
+    buf[30..32].copy_from_slice(&n.to_be_bytes());
+    Token::Int(U256::from_big_endian(&buf))
+}

@@ -1,0 +1,473 @@
+Time: 2025-04-11 23:24:22
+Pool Address: 0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf
+Fee: 500 (in hundredths of a bip)
+Tick Spacing: 10
+Max Liquidity per Tick: 1917569901783203986719870431555990
+Current Liquidity: 2274110721523610
+
+Token 0:
+  Address: 0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9
+  Symbol: USDT
+  Name: Tether
+  Decimals: 6
+
+Token 1:
+  Address: 0xaf88d065e77c8cc2239327c5edb3a432268e5831
+  Symbol: USDC
+  Name: USD Coin
+  Decimals: 6
+
+Slot0 Info:
+  Sqrt Price X96: 79254181511658700778251041966
+  Tick: 6
+  Observation Index: 77
+  Observation Cardinality: 300
+  Observation Cardinality Next: 300
+  Fee Protocol: 0
+  Unlocked: true
+
+Initialized Ticks: 49
+  Tick Index: -13890
+    Liquidity Gross: 4003593903
+    Liquidity Net: 4003593903
+    Fee Growth Outside 0: 1135253472479204324501550567599440355
+    Fee Growth Outside 1: 144766027412600412970446371096459844
+    Tick Cumulative Outside: -17187870
+    Seconds Per Liquidity Outside: 645461348784507945966770827807
+    Seconds Outside: 1627355800
+    Initialized: true
+  Tick Index: -13880
+    Liquidity Gross: 4003593903
+    Liquidity Net: -4003593903
+    Fee Growth Outside 0: 1136276191577456696382533230637250195
+    Fee Growth Outside 1: 145021364538750175757808191987754060
+    Tick Cumulative Outside: -17187870
+    Seconds Per Liquidity Outside: 645461348784507945966770827807
+    Seconds Outside: 1627355800
+    Initialized: true
+  Tick Index: -2230
+    Liquidity Gross: 849025702
+    Liquidity Net: 849025702
+    Fee Growth Outside 0: 2253461612928185039649555123680546433
+    Fee Growth Outside 1: 681812774684982038047414026543257469
+    Tick Cumulative Outside: -916082
+    Seconds Per Liquidity Outside: 622642227549906960493639440729
+    Seconds Outside: 1620383397
+    Initialized: true
+  Tick Index: -1740
+    Liquidity Gross: 120036560
+    Liquidity Net: 120036560
+    Fee Growth Outside 0: 2343387552062831963766506265260449985
+    Fee Growth Outside 1: 756477238036185563989083993499294740
+    Tick Cumulative Outside: -20356494
+    Seconds Per Liquidity Outside: 649778351542165855568599807998
+    Seconds Outside: 1628943973
+    Initialized: true
+  Tick Index: -1200
+    Liquidity Gross: 37128874041
+    Liquidity Net: 37128874041
+    Fee Growth Outside 0: 5477574910426073945680145692903830755
+    Fee Growth Outside 1: 152998731074803395057805621984341014603
+    Tick Cumulative Outside: -71519288
+    Seconds Per Liquidity Outside: 3742299390236222737275120836699
+    Seconds Outside: 1678526555
+    Initialized: true
+  Tick Index: -1160
+    Liquidity Gross: 37128874041
+    Liquidity Net: -37128874041
+    Fee Growth Outside 0: 5480236877039181769237174905361431581
+    Fee Growth Outside 1: 153001097457815459262815370952194741314
+    Tick Cumulative Outside: -71519288
+    Seconds Per Liquidity Outside: 3742299390236222737275120836699
+    Seconds Outside: 1678526555
+    Initialized: true
+  Tick Index: -1050
+    Liquidity Gross: 3368621043
+    Liquidity Net: 3368621043
+    Fee Growth Outside 0: 2853146615627681386791894491389113398
+    Fee Growth Outside 1: 1202862606053598961502082505074907608
+    Tick Cumulative Outside: -11667537
+    Seconds Per Liquidity Outside: 677993202737383124255128727893
+    Seconds Outside: 1620313067
+    Initialized: true
+  Tick Index: -950
+    Liquidity Gross: 1319304660
+    Liquidity Net: 1319304660
+    Fee Growth Outside 0: 2997334471544165854379562429716539888
+    Fee Growth Outside 1: 1333304237771156158649797540475472182
+    Tick Cumulative Outside: -20754301
+    Seconds Per Liquidity Outside: 691220771423997245334130217318
+    Seconds Outside: 1620304035
+    Initialized: true
+  Tick Index: -490
+    Liquidity Gross: 109246191
+    Liquidity Net: 109246191
+    Fee Growth Outside 0: 3527973239183117914154635607422101679
+    Fee Growth Outside 1: 1827620572510571146393997299432834371
+    Tick Cumulative Outside: -72420386
+    Seconds Per Liquidity Outside: 736193962613772085768682361292
+    Seconds Outside: 1620414096
+    Initialized: true
+  Tick Index: -360
+    Liquidity Gross: 185555784
+    Liquidity Net: 185555784
+    Fee Growth Outside 0: 3639289959999377844492786985285343137
+    Fee Growth Outside 1: 1934326180024933298621561275782857578
+    Tick Cumulative Outside: -90343096
+    Seconds Per Liquidity Outside: 754032252126202552120890564004
+    Seconds Outside: 1620387687
+    Initialized: true
+  Tick Index: -220
+    Liquidity Gross: 4641040041
+    Liquidity Net: 4641040041
+    Fee Growth Outside 0: 3762294915926637429019026984486026766
+    Fee Growth Outside 1: 2053788707379757668880957116178371327
+    Tick Cumulative Outside: -97115827
+    Seconds Per Liquidity Outside: 778075090170472923466856996326
+    Seconds Outside: 1620497021
+    Initialized: true
+  Tick Index: -200
+    Liquidity Gross: 500638942
+    Liquidity Net: 500638942
+    Fee Growth Outside 0: 3782588680221164334415056458689332648
+    Fee Growth Outside 1: 2073736233043880970846924017161564877
+    Tick Cumulative Outside: -97106083
+    Seconds Per Liquidity Outside: 778217675820996352565401453240
+    Seconds Outside: 1620411810
+    Initialized: true
+  Tick Index: -170
+    Liquidity Gross: 12675517525
+    Liquidity Net: 12675517525
+    Fee Growth Outside 0: 3802033341152692376992502343387102549
+    Fee Growth Outside 1: 2092772681440211242473804097022158181
+    Tick Cumulative Outside: -103627277
+    Seconds Per Liquidity Outside: 791652536635857486492625799777
+    Seconds Outside: 1621308255
+    Initialized: true
+  Tick Index: -150
+    Liquidity Gross: 350550438814
+    Liquidity Net: 350550438814
+    Fee Growth Outside 0: 3812652760892017013766804198537215217
+    Fee Growth Outside 1: 2103280822673114112882466397274747137
+    Tick Cumulative Outside: -97996167
+    Seconds Per Liquidity Outside: 780651156600229417981470153195
+    Seconds Outside: 1620422947
+    Initialized: true
+  Tick Index: -120
+    Liquidity Gross: 13974827628694
+    Liquidity Net: 13974827628694
+    Fee Growth Outside 0: 3831282464051145111483383101197226702
+    Fee Growth Outside 1: 2121614468410558735097643349722322734
+    Tick Cumulative Outside: -102899492
+    Seconds Per Liquidity Outside: 785084092783001933712894321598
+    Seconds Outside: 1620496855
+    Initialized: true
+  Tick Index: -110
+    Liquidity Gross: 1941416787053
+    Liquidity Net: 1941416787053
+    Fee Growth Outside 0: 3836590903405017612559385543206177589
+    Fee Growth Outside 1: 2126905179093183536978329542225177470
+    Tick Cumulative Outside: -103504129
+    Seconds Per Liquidity Outside: 783755878676262855615905214412
+    Seconds Outside: 1620453851
+    Initialized: true
+  Tick Index: -100
+    Liquidity Gross: 2118936193834
+    Liquidity Net: 2118936193834
+    Fee Growth Outside 0: 3842265121892097399238702620842911203
+    Fee Growth Outside 1: 2132538458477593178961243565126955123
+    Tick Cumulative Outside: -104066446
+    Seconds Per Liquidity Outside: 782799395954062274441489538371
+    Seconds Outside: 1620456564
+    Initialized: true
+  Tick Index: -90
+    Liquidity Gross: 1388104081832
+    Liquidity Net: -1388104081832
+    Fee Growth Outside 0: 5944800526161268282306735995462786519
+    Fee Growth Outside 1: 153442945812290564303070090729141392685
+    Tick Cumulative Outside: -154599752
+    Seconds Per Liquidity Outside: 3821219681567375720726225676810
+    Seconds Outside: 1678712483
+    Initialized: true
+  Tick Index: -70
+    Liquidity Gross: 693377477324
+    Liquidity Net: 693377477324
+    Fee Growth Outside 0: 3864105794595263575621562417060858872
+    Fee Growth Outside 1: 2154122256678706468066981832445943099
+    Tick Cumulative Outside: -106017321
+    Seconds Per Liquidity Outside: 792149762694204031450876215360
+    Seconds Outside: 1620590091
+    Initialized: true
+  Tick Index: -60
+    Liquidity Gross: 5352585451
+    Liquidity Net: 5352585451
+    Fee Growth Outside 0: 3871466281376009358564905265965794188
+    Fee Growth Outside 1: 2161471402855461113954832323913706722
+    Tick Cumulative Outside: -106791871
+    Seconds Per Liquidity Outside: 795699482977725649737856803100
+    Seconds Outside: 1620520883
+    Initialized: true
+  Tick Index: -50
+    Liquidity Gross: 360327060873
+    Liquidity Net: 360327060873
+    Fee Growth Outside 0: 3878483840095944808705161621758984731
+    Fee Growth Outside 1: 2168482521563477232481571270583168285
+    Tick Cumulative Outside: -111383719
+    Seconds Per Liquidity Outside: 796111276202952158508862079313
+    Seconds Outside: 1620576996
+    Initialized: true
+  Tick Index: -40
+    Liquidity Gross: 377722329160
+    Liquidity Net: 377722329160
+    Fee Growth Outside 0: 3886036513414525742731671629969075527
+    Fee Growth Outside 1: 2175946101292243879116730511577299191
+    Tick Cumulative Outside: -114403515
+    Seconds Per Liquidity Outside: 829323440880061685896321542900
+    Seconds Outside: 1620685277
+    Initialized: true
+  Tick Index: -30
+    Liquidity Gross: 20460931177006
+    Liquidity Net: 20460931177006
+    Fee Growth Outside 0: 3894482514332777162287906614461654833
+    Fee Growth Outside 1: 2184424434645617966820342550624261678
+    Tick Cumulative Outside: -127674130
+    Seconds Per Liquidity Outside: 1053573060369448454165028886878
+    Seconds Outside: 1621029391
+    Initialized: true
+  Tick Index: -20
+    Liquidity Gross: 99310197551939
+    Liquidity Net: 99310197551939
+    Fee Growth Outside 0: 3901792736853268072145393368103759810
+    Fee Growth Outside 1: 2191695797705721740347041368814241570
+    Tick Cumulative Outside: -140646230
+    Seconds Per Liquidity Outside: 2200192750662916926544048197731
+    Seconds Outside: 1621516535
+    Initialized: true
+  Tick Index: -10
+    Liquidity Gross: 2147329597861814
+    Liquidity Net: 2144353212016540
+    Fee Growth Outside 0: 3909230488900019809305802737041130458
+    Fee Growth Outside 1: 2199124237015882199139010048955010888
+    Tick Cumulative Outside: -172491704
+    Seconds Per Liquidity Outside: 3944186528239828253021229696481
+    Seconds Outside: 1623788214
+    Initialized: true
+  Tick Index: 0
+    Liquidity Gross: 13803226029222
+    Liquidity Net: -8474500097900
+    Fee Growth Outside 0: 3924976846647765689792925703978843683
+    Fee Growth Outside 1: 2214882373167650724706228588351516102
+    Tick Cumulative Outside: -464584855
+    Seconds Per Liquidity Outside: 7152522033678698393089868144299
+    Seconds Outside: 1695358649
+    Initialized: true
+  Tick Index: 10
+    Liquidity Gross: 2145665921001236
+    Liquidity Net: -2144472117529398
+    Fee Growth Outside 0: 2728624953429246018839732440160117704
+    Fee Growth Outside 1: 158793593360044343226492828166242229996
+    Tick Cumulative Outside: 113706169
+    Seconds Per Liquidity Outside: 11688349014406442386064262924666
+    Seconds Outside: 7421302
+    Initialized: true
+  Tick Index: 20
+    Liquidity Gross: 106518251650319
+    Liquidity Net: -106518251650319
+    Fee Growth Outside 0: 2714849982690329221664138187823490606
+    Fee Growth Outside 1: 158779797171951479576246249656039796562
+    Tick Cumulative Outside: 24467562
+    Seconds Per Liquidity Outside: 5262626864518434620358262874956
+    Seconds Outside: 715937
+    Initialized: true
+  Tick Index: 30
+    Liquidity Gross: 4462716765234
+    Liquidity Net: -4462716765234
+    Fee Growth Outside 0: 2694698283399275367493944530722747644
+    Fee Growth Outside 1: 158759594542505243392992179482105148458
+    Tick Cumulative Outside: 12933537
+    Seconds Per Liquidity Outside: 1510413784883796434289824075771
+    Seconds Outside: 196573
+    Initialized: true
+  Tick Index: 40
+    Liquidity Gross: 596100601229
+    Liquidity Net: -596100601229
+    Fee Growth Outside 0: 2666597354347912170787238577517422281
+    Fee Growth Outside 1: 158731394707048233620498179239249387825
+    Tick Cumulative Outside: 9907859
+    Seconds Per Liquidity Outside: 1359132245021285541004469792843
+    Seconds Outside: 107700
+    Initialized: true
+  Tick Index: 50
+    Liquidity Gross: 344056076889
+    Liquidity Net: -344056076889
+    Fee Growth Outside 0: 2638191981952422246394873840097876294
+    Fee Growth Outside 1: 158702861485702055065296505884162784604
+    Tick Cumulative Outside: 8074200
+    Seconds Per Liquidity Outside: 1279744429475462122545879685791
+    Seconds Outside: 65821
+    Initialized: true
+  Tick Index: 70
+    Liquidity Gross: 693377477324
+    Liquidity Net: -693377477324
+    Fee Growth Outside 0: 2588505036746244142469319316104078778
+    Fee Growth Outside 1: 158652876375630129099467720096372118913
+    Tick Cumulative Outside: 6966562
+    Seconds Per Liquidity Outside: 1168977013598665773811331780912
+    Seconds Outside: 46704
+    Initialized: true
+  Tick Index: 100
+    Liquidity Gross: 1138979184479
+    Liquidity Net: -1138979184479
+    Fee Growth Outside 0: 2518795738695390527865157819827386993
+    Fee Growth Outside 1: 158582573649082196016363984557325687392
+    Tick Cumulative Outside: 5477348
+    Seconds Per Liquidity Outside: 1057459993033135519356417834802
+    Seconds Outside: 28570
+    Initialized: true
+  Tick Index: 110
+    Liquidity Gross: 13978852233020
+    Liquidity Net: -13978852233020
+    Fee Growth Outside 0: 2497915418446640432426156858205884163
+    Fee Growth Outside 1: 158561473072051091460957764275579919907
+    Tick Cumulative Outside: 5159919
+    Seconds Per Liquidity Outside: 1028856695538827407432852953136
+    Seconds Outside: 25568
+    Initialized: true
+  Tick Index: 120
+    Liquidity Gross: 569356512660
+    Liquidity Net: -569356512660
+    Fee Growth Outside 0: 2478263276966755228717299795745010353
+    Fee Growth Outside 1: 158541593710020179004756400934327494686
+    Tick Cumulative Outside: 4998824
+    Seconds Per Liquidity Outside: 1006116897357157237757107203859
+    Seconds Outside: 24177
+    Initialized: true
+  Tick Index: 140
+    Liquidity Gross: 946103844999
+    Liquidity Net: -946103844999
+    Fee Growth Outside 0: 2439916609486058049323283270461843081
+    Fee Growth Outside 1: 158502744984765192341580438822255478832
+    Tick Cumulative Outside: 4626583
+    Seconds Per Liquidity Outside: 961837522163568294895477532695
+    Seconds Outside: 21339
+    Initialized: true
+  Tick Index: 150
+    Liquidity Gross: 363225956339
+    Liquidity Net: -363225956339
+    Fee Growth Outside 0: 2420282937791908184548122005538790561
+    Fee Growth Outside 1: 158482824577924323872726255016407749138
+    Tick Cumulative Outside: 4318970
+    Seconds Per Liquidity Outside: 927797593895312804649931438160
+    Seconds Outside: 19222
+    Initialized: true
+  Tick Index: 200
+    Liquidity Gross: 15273101944
+    Liquidity Net: -15273101944
+    Fee Growth Outside 0: 2317339017978663097693077324986061771
+    Fee Growth Outside 1: 158378060515388906218837097223431819734
+    Tick Cumulative Outside: 2400440
+    Seconds Per Liquidity Outside: 735925185687146711800990422864
+    Seconds Outside: 8235
+    Initialized: true
+  Tick Index: 300
+    Liquidity Gross: 4641040041
+    Liquidity Net: -4641040041
+    Fee Growth Outside 0: 2168586335444963148242168214963112918
+    Fee Growth Outside 1: 158225638266392168542576996545532890478
+    Tick Cumulative Outside: 1236657
+    Seconds Per Liquidity Outside: 640167410271152330028771835398
+    Seconds Outside: 3161
+    Initialized: true
+  Tick Index: 360
+    Liquidity Gross: 185555784
+    Liquidity Net: -185555784
+    Fee Growth Outside 0: 2116465122480026891645183084591909836
+    Fee Growth Outside 1: 158171777719560995220311934888303036965
+    Tick Cumulative Outside: 1033048
+    Seconds Per Liquidity Outside: 627938992172275786879855207699
+    Seconds Outside: 2542
+    Initialized: true
+  Tick Index: 510
+    Liquidity Gross: 12145302
+    Liquidity Net: -12145302
+    Fee Growth Outside 0: 579781169217293901610774095711331893
+    Fee Growth Outside 1: 7434452875977334202788131792677964553
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+  Tick Index: 950
+    Liquidity Gross: 3797316181
+    Liquidity Net: -3797316181
+    Fee Growth Outside 0: 1863056566153244000199055000955231985
+    Fee Growth Outside 1: 157901902387495118717083516317379507882
+    Tick Cumulative Outside: 74490
+    Seconds Per Liquidity Outside: 361850013100151903636299907923
+    Seconds Outside: 78
+    Initialized: true
+  Tick Index: 1490
+    Liquidity Gross: 120036560
+    Liquidity Net: -120036560
+    Fee Growth Outside 0: 1710460644393973050405711799096351709
+    Fee Growth Outside 1: 157729686449443729581461568731393859880
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+  Tick Index: 1820
+    Liquidity Gross: 849025702
+    Liquidity Net: -849025702
+    Fee Growth Outside 0: 1629299301802270216166123259031721079
+    Fee Growth Outside 1: 157633937143828633214360474079546766578
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+  Tick Index: 27080
+    Liquidity Gross: 198612890
+    Liquidity Net: 198612890
+    Fee Growth Outside 0: 129180414446648520297236872319616918
+    Fee Growth Outside 1: 152901714661189192700767533692173426852
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+  Tick Index: 34000
+    Liquidity Gross: 198612890
+    Liquidity Net: -198612890
+    Fee Growth Outside 0: 64166162463035894483773010319268343
+    Fee Growth Outside 1: 151528007031628336381328956229616543333
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+  Tick Index: 78920
+    Liquidity Gross: 864595509
+    Liquidity Net: 864595509
+    Fee Growth Outside 0: 3098265082247887978163821009091393
+    Fee Growth Outside 1: 139257800718588201356462283805706304412
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+  Tick Index: 79040
+    Liquidity Gross: 864595509
+    Liquidity Net: -864595509
+    Fee Growth Outside 0: 3078540193212068182257127749817065
+    Fee Growth Outside 1: 139204822049510490356175874305112015890
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+  Tick Index: 887270
+    Liquidity Gross: 2705470206
+    Liquidity Net: -2705470206
+    Fee Growth Outside 0: 0
+    Fee Growth Outside 1: 0
+    Tick Cumulative Outside: 0
+    Seconds Per Liquidity Outside: 0
+    Seconds Outside: 0
+    Initialized: true
+
+---
+
